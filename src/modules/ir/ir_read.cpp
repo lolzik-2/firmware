@@ -89,7 +89,10 @@ void IrRead::setup() {
     }
     if (count == 0) gsetIrRxPin(true);
 
-    setup_ir_pin(bruceConfigPins.irRx, INPUT);
+    // === НАШ ФИКС: Убираем setup_ir_pin и ставим обычный INPUT ===
+    pinMode(bruceConfigPins.irRx, INPUT);
+    // ===========================================================
+
     if (headless) return;
     returnToMenu = true;
     std::vector<Option> quickRemoteOptions = {
@@ -187,6 +190,11 @@ void IrRead::loop() {
 void IrRead::begin() {
     _read_signal = false;
 
+    // === НАШ ФИКС: Сбрасываем буфер и даем приёмнику успокоиться ===
+    irrecv.resume();
+    delay(100);
+    // ==============================================================
+
     display_banner();
     if (quickloop) {
         padprintln("Waiting for signal of button: " + String(quickButtons[button_pos]));
@@ -239,9 +247,18 @@ void IrRead::display_btn_options() {
 void IrRead::read_signal() {
     if (_read_signal || !irrecv.decode(&results)) return;
 
+    // === НАШ ФИКС: Отбрасываем короткий шум ===
+    if (results.rawlen < 20) {
+        irrecv.resume();
+        return;
+    }
+    // ============================================
+
     _read_signal = true;
 
-    raw = (results.decode_type == decode_type_t::UNKNOWN) || hasACState(results.decode_type);
+    // === НАШ ФИКС: Принудительно пишем RAW, чтобы не блокировать меню ===
+    raw = true;
+    // ====================================================================
 
     display_banner();
 
