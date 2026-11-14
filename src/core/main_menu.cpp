@@ -19,7 +19,7 @@ MainMenu::MainMenu() {
 #if !defined(LITE_VERSION)
         &ethernetMenu,
 #endif
-        &gpsMenu,
+        // &gpsMenu,       // <--- УДАЛЕНО: Жрет память, на Cardputer/Stick GPS не нужен
         &rfidMenu,
         &fileMenu,
 #if !defined(LITE_VERSION) && !defined(DISABLE_INTERPRETER)
@@ -27,9 +27,7 @@ MainMenu::MainMenu() {
 #endif
         &clockMenu,
         &othersMenu,
-#if !defined(LITE_VERSION)
-        &wireToolsMenu,
-#endif
+        // &wireToolsMenu, // <--- УДАЛЕНО: Новый тяжелый раздел из 1.17, забирает PSRAM
         &configMenu,
     };
 
